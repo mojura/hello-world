@@ -8,6 +8,10 @@ import (
 const (
 	// ErrEmptyUserID is returned when the User ID for an Entry is empty
 	ErrEmptyUserID = errors.Error("invalid user ID, cannot be empty")
+	// ErrEmptyGreeting is returned when the Greeting for an Entry is empty
+	ErrEmptyGreeting = errors.Error("invalid greeting, cannot be empty")
+	// ErrEmptyFavoriteTimeOfDay is returned when the Favorite time of day for an Entry is empty
+	ErrEmptyFavoriteTimeOfDay = errors.Error("invalid favorite time of day, cannot be empty")
 )
 
 // Entry represents a stored entry within the Controller
@@ -41,6 +45,16 @@ func (e *Entry) Validate() (err error) {
 	if len(e.UserID) == 0 {
 		// User ID is empty, append ErrEmptyUserID
 		errs.Push(ErrEmptyUserID)
+	}
+
+	if len(e.Greeting) == 0 {
+		// Greeting is empty, append ErrEmptyGreeting
+		errs.Push(ErrEmptyGreeting)
+	}
+
+	if len(e.FavoriteTimeOfDay) == 0 {
+		// Favorite time of day is empty, append ErrEmptyFavoriteTimeOfDay
+		errs.Push(ErrEmptyFavoriteTimeOfDay)
 	}
 
 	// Note: If error list is empty, a nil value is returned
