@@ -107,6 +107,27 @@ func (c *Controller) ForEach(fn func(*Entry) error) (err error) {
 	return
 }
 
+// ForEachByUser will iterate through all Entries for a provided userID
+// Note: The error constant dbl.Break can returned by the iterating func to end the iteration early
+func (c *Controller) ForEachByUser(userID string, fn func(*Entry) error) (err error) {
+	// Iterate through all entries
+	c.c.ForEachRelationship(relationshipUsers, userID, func(key string, val dbl.Value) (err error) {
+		// Attempt to assert the value as an *Entry
+		e, ok := val.(*Entry)
+		// Ensure assertion was successful
+		if !ok {
+			// Invalid type provided, return error
+			err = fmt.Errorf("invalid entry type, expected %T and received %T", e, val)
+			return
+		}
+
+		// Pass iterating Entry to iterating function
+		return fn(e)
+	})
+
+	return
+}
+
 // Update will update the Entry for a given entryID
 func (c *Controller) Update(entryID string, e Entry) (err error) {
 	// Attempt to validate Entry
