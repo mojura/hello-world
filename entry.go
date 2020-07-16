@@ -17,6 +17,11 @@ type Entry struct {
 
 	// UserID which Entry is related to, used a relational referenced
 	UserID string `json:"userID"`
+
+	// Greeting represents the favorite greeting of the related user
+	Greeting string `json:"greeting"`
+	// FavoriteTimeOfDay represents the favorite time of day of the related user
+	FavoriteTimeOfDay string `json:"favoriteTimeOfDay"`
 }
 
 // GetRelationshipIDs will return the relationship IDs associated with the Entry
