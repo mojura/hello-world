@@ -23,3 +23,9 @@ type Controller struct {
 	// Core will manage the data layer and will utilize the underlying back-end
 	c *dbl.Core
 }
+
+// Close will close the controller and it's underlying dependencies
+func (c *Controller) Close() (err error) {
+	// Since we only have one dependency, we can just call this func directly
+	return c.c.Close()
+}
