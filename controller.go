@@ -2,6 +2,18 @@ package helloworld
 
 import "github.com/gdbu/dbl"
 
+// Relationship key const block
+const (
+	// relationshipUsers represents the key for the UserID relationship
+	relationshipUsers = "users"
+)
+
+// relationships is a collection of all the supported relationship keys
+// Note: Utilizing this pattern makes it easier to expand the relationship list in the future
+var relationships = []string{
+	relationshipUsers,
+}
+
 // New will return a new instance of the Controller
 func New(dir string) (cc *Controller, err error) {
 	var c Controller
@@ -9,7 +21,8 @@ func New(dir string) (cc *Controller, err error) {
 	//	- Name of the controller (Must be unique, used to create the database files)
 	//	- Directory location to persist data
 	//	- Example Entry value (Used to populate reflected values)
-	if c.c, err = dbl.New("helloWorld", dir, &Entry{}); err != nil {
+	//	- Appended list of relationship keys
+	if c.c, err = dbl.New("helloWorld", dir, &Entry{}, relationships...); err != nil {
 		return
 	}
 
@@ -35,6 +48,22 @@ func (c *Controller) Get(entryID string) (entry *Entry, err error) {
 
 	// Assign reference to retrieved Entry
 	entry = &e
+	return
+}
+
+// GetByUser will retrieve all Entries related to the provided userID by way of the Users relationship
+func (c *Controller) GetByUser(userID string) (entries []*Entry, err error) {
+	var e Entry
+	// Attempt to get the Entries related to the userID, passing the:
+	//	- Relationship type (Users)
+	//	- Relationship ID (userID)
+	//	- Entries slice to be appended to
+	if err = c.c.GetByRelationship(relationshipUsers, userID, &e); err != nil {
+		// No entry with the provided ID was found, return error
+		// Note: Utilizing this err/return pattern will yield in less mistakes if/when logic is expanded below
+		return
+	}
+
 	return
 }
 
