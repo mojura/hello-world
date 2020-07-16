@@ -1,6 +1,10 @@
 package helloworld
 
-import "github.com/gdbu/dbl"
+import (
+	"fmt"
+
+	"github.com/gdbu/dbl"
+)
 
 // Relationship key const block
 const (
@@ -82,6 +86,27 @@ func (c *Controller) GetByUser(userID string) (entries []*Entry, err error) {
 	return
 }
 
+// ForEach will iterate through all Entries
+// Note: The error constant dbl.Break can returned by the iterating func to end the iteration early
+func (c *Controller) ForEach(fn func(*Entry) error) (err error) {
+	// Iterate through all entries
+	c.c.ForEach(func(key string, val dbl.Value) (err error) {
+		// Attempt to assert the value as an *Entry
+		e, ok := val.(*Entry)
+		// Ensure assertion was successful
+		if !ok {
+			// Invalid type provided, return error
+			err = fmt.Errorf("invalid entry type, expected %T and received %T", e, val)
+			return
+		}
+
+		// Pass iterating Entry to iterating function
+		return fn(e)
+	})
+
+	return
+}
+
 // Update will update the Entry for a given entryID
 func (c *Controller) Update(entryID string, e Entry) (err error) {
 	// Attempt to validate Entry
@@ -94,6 +119,12 @@ func (c *Controller) Update(entryID string, e Entry) (err error) {
 
 	// Insert Entry into dbl.Core and return the results
 	return c.c.Edit(entryID, &e)
+}
+
+// Delete will remove an Entry for a given entryID
+func (c *Controller) Delete(entryID string) (err error) {
+	// Remove Entry from dbl.Core
+	return c.c.Remove(entryID)
 }
 
 // Close will close the controller and it's underlying dependencies
