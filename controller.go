@@ -24,6 +24,20 @@ type Controller struct {
 	c *dbl.Core
 }
 
+// Get will retrieve an Entry which has the same ID as the provided entryID
+func (c *Controller) Get(entryID string) (entry *Entry, err error) {
+	var e Entry
+	// Attempt to get Entry with the provided ID, pass reference to entry for which values to be applied
+	if err = c.c.Get(entryID, &e); err != nil {
+		// No entry with the provided ID was found, return error
+		return
+	}
+
+	// Assign reference to retrieved Entry
+	entry = &e
+	return
+}
+
 // Close will close the controller and it's underlying dependencies
 func (c *Controller) Close() (err error) {
 	// Since we only have one dependency, we can just call this func directly
