@@ -37,6 +37,21 @@ type Controller struct {
 	c *dbl.Core
 }
 
+// New will insert a new Entry to the back-end
+// Note: ID, CreatedAt, UpdatedAt will all be auto-set by dbl.Core
+func (c *Controller) New(e Entry) (createdID string, err error) {
+	// Attempt to validate Entry
+	if err = e.Validate(); err != nil {
+		// Entry is not valid, return validation error
+		return
+	}
+
+	// Entry is valid!
+
+	// Insert Entry into dbl.Core and return the results
+	return c.c.New(&e)
+}
+
 // Get will retrieve an Entry which has the same ID as the provided entryID
 func (c *Controller) Get(entryID string) (entry *Entry, err error) {
 	var e Entry
