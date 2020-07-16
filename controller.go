@@ -82,6 +82,20 @@ func (c *Controller) GetByUser(userID string) (entries []*Entry, err error) {
 	return
 }
 
+// Update will update the Entry for a given entryID
+func (c *Controller) Update(entryID string, e Entry) (err error) {
+	// Attempt to validate Entry
+	if err = e.Validate(); err != nil {
+		// Entry is not valid, return validation error
+		return
+	}
+
+	// Entry is valid!
+
+	// Insert Entry into dbl.Core and return the results
+	return c.c.Edit(entryID, &e)
+}
+
 // Close will close the controller and it's underlying dependencies
 func (c *Controller) Close() (err error) {
 	// Since we only have one dependency, we can just call this func directly
