@@ -12,3 +12,6 @@ A controller is a self-contained component which manages it's own data store and
 - MariaDB
 
 In the case of our example, we will be utilizing BoltDB.
+
+## Why would I want to utilize a controller?
+Controllers provide a fantastic and scalable pattern for applications big and small. Keeping logic and data constrained to controllers enforces good separation of logic and flow. In addition, a well modularized system can easily be scaled horizontally in a micro-service architecture if and when needed.
