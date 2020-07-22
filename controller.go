@@ -111,7 +111,7 @@ func (c *Controller) ForEach(fn func(*Entry) error) (err error) {
 // Note: The error constant dbl.Break can returned by the iterating func to end the iteration early
 func (c *Controller) ForEachByUser(userID string, fn func(*Entry) error) (err error) {
 	// Iterate through all entries
-	c.c.ForEachRelationship(relationshipUsers, userID, func(key string, val dbl.Value) (err error) {
+	err = c.c.ForEachRelationship(relationshipUsers, userID, func(key string, val dbl.Value) (err error) {
 		// Attempt to assert the value as an *Entry
 		e, ok := val.(*Entry)
 		// Ensure assertion was successful
