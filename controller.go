@@ -72,12 +72,11 @@ func (c *Controller) Get(entryID string) (entry *Entry, err error) {
 
 // GetByUser will retrieve all Entries related to the provided userID by way of the Users relationship
 func (c *Controller) GetByUser(userID string) (entries []*Entry, err error) {
-	var e Entry
 	// Attempt to get the Entries related to the userID, passing the:
 	//	- Relationship type (Users)
 	//	- Relationship ID (userID)
 	//	- Entries slice to be appended to
-	if err = c.c.GetByRelationship(relationshipUsers, userID, &e); err != nil {
+	if err = c.c.GetByRelationship(relationshipUsers, userID, &entries); err != nil {
 		// No entry with the provided ID was found, return error
 		// Note: Utilizing this err/return pattern will yield in less mistakes if/when logic is expanded below
 		return
