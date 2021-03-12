@@ -1,8 +1,8 @@
 package helloworld
 
 import (
-	"github.com/Hatch1fy/errors"
-	"github.com/gdbu/dbl"
+	"github.com/hatchify/errors"
+	"github.com/mojura/mojura"
 )
 
 const (
@@ -16,8 +16,8 @@ const (
 
 // Entry represents a stored entry within the Controller
 type Entry struct {
-	// Include dbl.Entry to auto-populate fields/methods needed to match the
-	dbl.Entry
+	// Include mojura.Entry to auto-populate fields/methods needed to match the
+	mojura.Entry
 
 	// UserID which Entry is related to, used a relational referenced
 	UserID string `json:"userID"`
@@ -29,11 +29,11 @@ type Entry struct {
 }
 
 // GetRelationshipIDs will return the relationship IDs associated with the Entry
-func (e *Entry) GetRelationshipIDs() (ids []string) {
+func (e *Entry) GetRelationships() (r mojura.Relationships) {
 	// UserID is our only relationship at the moment. Any number of relationships can
 	// be set for entries. Just know that each added relationship is an extra reference
-	// to be managed by DBL and stored by the underlying back-end.
-	ids = append(ids, e.UserID)
+	// to be managed by Mojua and stored by the underlying back-end.
+	r.Append(e.UserID)
 	return
 }
 

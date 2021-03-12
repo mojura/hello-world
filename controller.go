@@ -3,7 +3,8 @@ package helloworld
 import (
 	"fmt"
 
-	"github.com/gdbu/dbl"
+	"github.com/mojura/mojura"
+	"github.com/mojura/mojura/filters"
 )
 
 // Relationship key const block
@@ -21,12 +22,12 @@ var relationships = []string{
 // New will return a new instance of the Controller
 func New(dir string) (cc *Controller, err error) {
 	var c Controller
-	// Initialize a new instance of dbl.Core, we pass it the following values:
+	// Initialize a new instance of mojura.Mojura, we pass it the following values:
 	//	- Name of the controller (Must be unique, used to create the database files)
 	//	- Directory location to persist data
 	//	- Example Entry value (Used to populate reflected values)
 	//	- Appended list of relationship keys
-	if c.c, err = dbl.New("helloWorld", dir, &Entry{}, relationships...); err != nil {
+	if c.c, err = mojura.New("helloWorld", dir, &Entry{}, relationships...); err != nil {
 		return
 	}
 
@@ -37,12 +38,12 @@ func New(dir string) (cc *Controller, err error) {
 
 // Controller represents a management layer to facilitate the retrieval and modification of Entries
 type Controller struct {
-	// Core will manage the data layer and will utilize the underlying back-end
-	c *dbl.Core
+	// Mojura will manage the data layer and will utilize the underlying back-end
+	c *mojura.Mojura
 }
 
 // New will insert a new Entry to the back-end
-// Note: ID, CreatedAt, UpdatedAt will all be auto-set by dbl.Core
+// Note: ID, CreatedAt, UpdatedAt will all be auto-set by mojura.Mojura
 func (c *Controller) New(e Entry) (createdID string, err error) {
 	// Attempt to validate Entry
 	if err = e.Validate(); err != nil {
@@ -52,7 +53,7 @@ func (c *Controller) New(e Entry) (createdID string, err error) {
 
 	// Entry is valid!
 
-	// Insert Entry into dbl.Core and return the results
+	// Insert Entry into mojura.Mojura and return the results
 	return c.c.New(&e)
 }
 
@@ -72,11 +73,12 @@ func (c *Controller) Get(entryID string) (entry *Entry, err error) {
 
 // GetByUser will retrieve all Entries related to the provided userID by way of the Users relationship
 func (c *Controller) GetByUser(userID string) (entries []*Entry, err error) {
-	// Attempt to get the Entries related to the userID, passing the:
-	//	- Relationship type (Users)
-	//	- Relationship ID (userID)
-	//	- Entries slice to be appended to
-	if err = c.c.GetByRelationship(relationshipUsers, userID, &entries); err != nil {
+	// Create user relationship match filter for provided user ID
+	ownedByUser := filters.Match(relationshipUsers, userID)
+	// Initialize opts with the user filter
+	opts := mojura.NewFilteringOpts(ownedByUser)
+	// Get all matching entries
+	if _, err = c.c.GetFiltered(&entries, opts); err != nil {
 		// No entry with the provided ID was found, return error
 		// Note: Utilizing this err/return pattern will yield in less mistakes if/when logic is expanded below
 		return
@@ -85,11 +87,11 @@ func (c *Controller) GetByUser(userID string) (entries []*Entry, err error) {
 	return
 }
 
-// ForEach will iterate through all Entries
-// Note: The error constant dbl.Break can returned by the iterating func to end the iteration early
+// ForEach without any filters will iterate through all Entries
+// Note: The error constant mojura.Break can returned by the iterating func to end the iteration early
 func (c *Controller) ForEach(fn func(*Entry) error) (err error) {
 	// Iterate through all entries
-	err = c.c.ForEach(func(key string, val dbl.Value) (err error) {
+	err = c.c.ForEach(func(key string, val mojura.Value) (err error) {
 		// Attempt to assert the value as an *Entry
 		e, ok := val.(*Entry)
 		// Ensure assertion was successful
@@ -101,16 +103,21 @@ func (c *Controller) ForEach(fn func(*Entry) error) (err error) {
 
 		// Pass iterating Entry to iterating function
 		return fn(e)
-	})
+	}, nil)
 
 	return
 }
 
 // ForEachByUser will iterate through all Entries for a provided userID
-// Note: The error constant dbl.Break can returned by the iterating func to end the iteration early
+// Note: The error constant mojura.Break can returned by the iterating func to end the iteration early
 func (c *Controller) ForEachByUser(userID string, fn func(*Entry) error) (err error) {
+	// Create user relationship match filter for provided user ID
+	ownedByUser := filters.Match(relationshipUsers, userID)
+	// Initialize opts with the user filter
+	opts := mojura.NewIteratingOpts(ownedByUser)
+
 	// Iterate through all entries
-	err = c.c.ForEachRelationship(relationshipUsers, userID, func(key string, val dbl.Value) (err error) {
+	err = c.c.ForEach(func(key string, val mojura.Value) (err error) {
 		// Attempt to assert the value as an *Entry
 		e, ok := val.(*Entry)
 		// Ensure assertion was successful
@@ -122,7 +129,7 @@ func (c *Controller) ForEachByUser(userID string, fn func(*Entry) error) (err er
 
 		// Pass iterating Entry to iterating function
 		return fn(e)
-	})
+	}, opts)
 
 	return
 }
@@ -137,13 +144,13 @@ func (c *Controller) Update(entryID string, e Entry) (err error) {
 
 	// Entry is valid!
 
-	// Insert Entry into dbl.Core and return the results
+	// Insert Entry into mojura.Mojura and return the results
 	return c.c.Edit(entryID, &e)
 }
 
 // Delete will remove an Entry for a given entryID
 func (c *Controller) Delete(entryID string) (err error) {
-	// Remove Entry from dbl.Core
+	// Remove Entry from mojura.Mojura
 	return c.c.Remove(entryID)
 }
 
