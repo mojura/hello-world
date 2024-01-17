@@ -1,17 +1,18 @@
 package helloworld
 
 import (
-	"github.com/hatchify/errors"
+	"errors"
+
 	"github.com/mojura/mojura"
 )
 
-const (
+var (
 	// ErrEmptyUserID is returned when the User ID for an Entry is empty
-	ErrEmptyUserID = errors.Error("invalid user ID, cannot be empty")
+	ErrEmptyUserID = errors.New("invalid user ID, cannot be empty")
 	// ErrEmptyGreeting is returned when the Greeting for an Entry is empty
-	ErrEmptyGreeting = errors.Error("invalid greeting, cannot be empty")
+	ErrEmptyGreeting = errors.New("invalid greeting, cannot be empty")
 	// ErrEmptyFavoriteTimeOfDay is returned when the Favorite time of day for an Entry is empty
-	ErrEmptyFavoriteTimeOfDay = errors.Error("invalid favorite time of day, cannot be empty")
+	ErrEmptyFavoriteTimeOfDay = errors.New("invalid favorite time of day, cannot be empty")
 )
 
 // Entry represents a stored entry within the Controller
@@ -39,24 +40,21 @@ func (e *Entry) GetRelationships() (r mojura.Relationships) {
 
 // Validate will ensure an Entry is valid
 func (e *Entry) Validate() (err error) {
-	// An error list allows us to collect all the errors and return them as a group
-	var errs errors.ErrorList
 	// Check to see if User ID is set
 	if len(e.UserID) == 0 {
 		// User ID is empty, append ErrEmptyUserID
-		errs.Push(ErrEmptyUserID)
+		return ErrEmptyUserID
 	}
 
 	if len(e.Greeting) == 0 {
 		// Greeting is empty, append ErrEmptyGreeting
-		errs.Push(ErrEmptyGreeting)
+		return ErrEmptyGreeting
 	}
 
 	if len(e.FavoriteTimeOfDay) == 0 {
 		// Favorite time of day is empty, append ErrEmptyFavoriteTimeOfDay
-		errs.Push(ErrEmptyFavoriteTimeOfDay)
+		return ErrEmptyFavoriteTimeOfDay
 	}
 
-	// Note: If error list is empty, a nil value is returned
-	return errs.Err()
+	return
 }
