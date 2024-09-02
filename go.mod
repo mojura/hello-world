@@ -1,8 +1,8 @@
 module github.com/mojura/hello-world
 
-go 1.21.0
+go 1.23.0
 
-require github.com/mojura/mojura v0.20.3
+require github.com/mojura/mojura v0.21.1
 
 require (
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
@@ -15,6 +15,6 @@ require (
 	github.com/mojura-backends/bolt v0.2.1 // indirect
 	github.com/mojura/backend v0.2.1 // indirect
 	github.com/mojura/enkodo v0.5.7 // indirect
-	github.com/mojura/kiroku v0.12.3 // indirect
-	golang.org/x/sys v0.9.0 // indirect
+	github.com/mojura/kiroku v0.14.1 // indirect
+	golang.org/x/sys v0.24.0 // indirect
 )

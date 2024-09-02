@@ -73,11 +73,10 @@ func (c *Controller) GetByUser(userID string) (entries []*Entry, err error) {
 
 	// Get all matching entries
 	if entries, _, err = c.c.GetFiltered(opts); err != nil {
-		// No entry with the provided ID was found, return error
-		// Note: Utilizing this err/return pattern will yield in less mistakes if/when logic is expanded below
 		return
 	}
 
+	// No matches will still yield no error
 	return
 }
 
@@ -113,6 +112,9 @@ func (c *Controller) Update(entryID string, e Entry) (updated *Entry, err error)
 
 	// Insert Entry into mojura.Mojura and return the results
 	return c.c.Update(entryID, func(orig *Entry) (err error) {
+		// It's safer to manually update each field, instead of replacing the entire entry.
+		// This helps to ensure that we don't trust the client fully and allow only specific
+		// fields to be updated
 		orig.FavoriteTimeOfDay = e.FavoriteTimeOfDay
 		orig.Greeting = e.Greeting
 		return
